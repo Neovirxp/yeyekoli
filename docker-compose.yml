@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  yeyekoli_api:
+    image: bitwalker/alpine-elixir-phoenix
+    ports:
+      - 7777:4000
+    volumes:
+      - ./src:/app/src
+      - ./scripts:/scripts
+      - ./src/_build/prod/rel:/app/src/_build/prod/rel
+      - phx.deps:/app/src/deps
+      - phx.builds:/app/src/_build
+    depends_on:
+      - postgres
+    environment:
+      - MIX_ENV=${ENV:-dev}
+      - PHX_PORT=${PHX_PORT:-4000}
+      - PHX_URL=${PHX_HOST:-localhost}
+      - PHX_SECRET_KEY_BASE=${PHX_SECRET_KEY_BASE:-secret}
+      - PG_URL=ecto://postgres:postgres@postgres/legavi_${ENV:-dev}
+    
+      - GUARDIAN_SECRET_KEY=${GUARDIAN_SECRET_KEY:-default}
+    working_dir: /app/src
+    command: mix phx.server
+
+  postgres:
+    image: postgres:9.6
+
+volumes:
+  phx.deps:
+  phx.builds:
